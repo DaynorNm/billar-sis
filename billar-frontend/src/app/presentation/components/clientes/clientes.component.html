@@ -1,0 +1,141 @@
+<div class="p-6 max-w-7xl mx-auto">
+
+  <div class="flex justify-between items-center mb-8 border-b border-gray-800 pb-5">
+    <div>
+      <h1 class="text-3xl font-extrabold text-white tracking-tight">Gestión de Clientes y Fidelidad</h1>
+      <p class="text-gray-400 mt-1">Administración de socios, acumulación manual de horas y canje de recompensas.</p>
+    </div>
+    <button (click)="abrirModalCrear()" class="bg-teal-600 hover:bg-teal-700 text-white font-semibold py-2 px-4 rounded-lg shadow-lg transition duration-200">
+      + Registrar Cliente
+    </button>
+  </div>
+
+  <div *ngIf="cargando" class="flex justify-center items-center h-48">
+    <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-teal-500"></div>
+    <span class="ml-3 text-gray-400">Consultando base de datos...</span>
+  </div>
+
+  <div *ngIf="!cargando" class="w-full bg-gray-950 border border-gray-800 rounded-2xl overflow-hidden shadow-2xl">
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="border-b border-gray-800 bg-gray-900/50 text-gray-400 text-xs font-bold uppercase tracking-wider">
+            <th class="p-4">Nombre</th>
+            <th class="p-4">Celular</th>
+            <th class="p-4">Progreso / Horas</th>
+            <th class="p-4">Estado Recompensa</th>
+            <th class="p-4 text-center">Acciones de Fidelidad</th>
+            <th class="p-4 text-center">Administración</th>
+          </tr>
+        </thead>
+        <tbody class="text-sm divide-y divide-gray-900">
+          <tr *ngFor="let c of listaClientes" class="hover:bg-gray-900/20 transition">
+            <td class="p-4 font-semibold text-white">{{ c.nombre }}</td>
+
+            <td class="p-4 font-mono text-gray-400">{{ c.telefono || '---' }}</td>
+
+            <td class="p-4 w-64">
+              <div class="flex items-center justify-between mb-1 text-xs">
+                <span class="text-teal-400 font-bold">{{ c.horasAcumuladas }} hrs totales</span>
+                <span class="text-gray-500 font-semibold">{{ c.horasAcumuladas % 10 }} / 10</span>
+              </div>
+              <div class="w-full bg-gray-900 rounded-full h-2 overflow-hidden border border-gray-800">
+                <div class="bg-teal-500 h-2 rounded-full transition-all duration-500"
+                     [style.width.%]="(c.horasAcumuladas % 10) * 10 || (c.horasAcumuladas > 0 && c.horasAcumuladas % 10 === 0 ? 100 : 0)">
+                </div>
+              </div>
+            </td>
+
+            <td class="p-4">
+              <span *ngIf="c.horasAcumuladas >= 10" class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-1 rounded-md text-xs font-bold block w-fit">
+                🎁 ¡1 Hora Disponible!
+              </span>
+              <span *ngIf="c.horasAcumuladas < 10" class="text-gray-500 text-xs">
+                Faltan {{ 10 - (c.horasAcumuladas % 10) }} hrs
+              </span>
+            </td>
+
+            <td class="p-4 text-center space-x-2">
+              <button (click)="abrirModalHoras(c)" class="bg-gray-900 hover:bg-gray-800 text-teal-400 border border-gray-800 hover:border-teal-500/30 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition">
+                ⚡ + Cargar Horas
+              </button>
+              <button (click)="reclamarPremio(c)" [disabled]="c.horasAcumuladas < 10" class="bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-900 disabled:text-gray-600 text-white px-2.5 py-1.5 rounded-lg text-xs font-bold transition shadow-md">
+                🎉 Canjear Recompensa
+              </button>
+            </td>
+
+            <td class="p-4 text-center space-x-2">
+              <button (click)="abrirModalEditar(c)" class="text-amber-400 hover:bg-amber-500/10 p-1.5 rounded-lg transition text-xs font-medium">
+                ✏️ Editar
+              </button>
+              <button (click)="eliminarCliente(c)" class="text-rose-500 hover:bg-rose-500/10 p-1.5 rounded-lg transition text-xs font-medium">
+                🗑️ Eliminar
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div *ngIf="mostrarModalForm" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+    <div class="bg-gray-950 border border-gray-800 rounded-2xl max-w-md w-full p-6 shadow-2xl animate-fade-in">
+      <div class="flex justify-between items-center mb-5 border-b border-gray-900 pb-3">
+        <h3 class="text-xl font-bold text-white">{{ editando ? 'Actualizar Datos del Cliente' : 'Registrar Nuevo Socio' }}</h3>
+        <button (click)="cerrarModalForm()" class="text-gray-500 hover:text-white text-lg">✕</button>
+      </div>
+
+      <form (ngSubmit)="guardarCliente()" #clienteForm="ngForm" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Nombre y Apellido</label>
+          <input type="text" name="nombre" [(ngModel)]="clienteModel.nombre" required placeholder="Ej. Alex Quispe"
+                 class="w-full bg-gray-900 border border-gray-800 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-teal-500 transition text-sm" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Número de Celular (Opcional)</label>
+          <input type="text" name="telefono" [(ngModel)]="clienteModel.telefono" placeholder="Ej. 75512345"
+                 class="w-full bg-gray-900 border border-gray-800 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-teal-500 transition text-sm" />
+        </div>
+
+        <div class="flex space-x-3 pt-4">
+          <button type="button" (click)="cerrarModalForm()" class="w-1/2 bg-gray-900 hover:bg-gray-800 text-gray-400 font-semibold py-3 rounded-xl transition text-sm">
+            Cancelar
+          </button>
+          <button type="submit" [disabled]="!clienteForm.form.valid" class="w-1/2 bg-teal-600 hover:bg-teal-700 disabled:bg-gray-800 disabled:text-gray-600 text-white font-semibold py-3 rounded-xl transition text-sm shadow-lg">
+            {{ editando ? 'Actualizar' : 'Guardar Socio' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div *ngIf="mostrarModalHoras" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+    <div class="bg-gray-950 border border-gray-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl animate-fade-in">
+      <div class="flex justify-between items-center mb-4 border-b border-gray-900 pb-3">
+        <h3 class="text-lg font-bold text-white">Cargar Horas Jugadas</h3>
+        <button (click)="cerrarModalHoras()" class="text-gray-500 hover:text-white text-lg">✕</button>
+      </div>
+
+      <p class="text-xs text-gray-400 mb-4">Ingresa las horas acumuladas por el cliente <span class="text-teal-400 font-bold">"{{ clienteSeleccionado?.nombre }}"</span> en su sesión de juego.</p>
+
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Cantidad de Horas</label>
+          <input type="number" [(ngModel)]="horasACargar" min="1" max="12"
+                 class="w-full bg-gray-900 border border-gray-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-teal-500 transition text-sm text-center font-bold text-lg" />
+        </div>
+
+        <div class="flex space-x-3 pt-2">
+          <button type="button" (click)="cerrarModalHoras()" class="w-1/2 bg-gray-900 hover:bg-gray-800 text-gray-400 font-semibold py-2.5 rounded-xl transition text-sm">
+            Cancelar
+          </button>
+          <button type="button" (click)="ejecutarCargaHoras()" class="w-1/2 bg-teal-600 hover:bg-teal-700 text-white font-semibold py-2.5 rounded-xl transition text-sm shadow-lg">
+            ⚡ Sumar Horas
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

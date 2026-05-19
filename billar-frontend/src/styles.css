@@ -1,0 +1,26 @@
+/* Inyectamos las capas de utilidades de Tailwind CSS */
+@import "tailwindcss";
+
+/* Estilos personalizados para todo nuestro sistema de billar */
+body {
+  background-color: #121318; /* Un fondo oscuro moderno */
+  color: #f3f4f6; /* Texto blanco suave para no cansar la vista */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* Scrollbar personalizado para que combine con el modo oscuro */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #1a1b23;
+}
+::-webkit-scrollbar-thumb {
+  background: #2e303f;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #0d9488;
+}

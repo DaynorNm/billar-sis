@@ -1,0 +1,47 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// --- NUESTROS MODELOS PARA EL BILLAR Y LA TIENDA ---
+
+enum EstadoMesa {
+  DISPONIBLE
+  OCUPADA
+  MANTENIMIENTO
+}
+
+model Mesa {
+  id            String     @id @default(uuid())
+  numero        Int        @unique
+  tipo          String     
+  estado        EstadoMesa @default(DISPONIBLE)
+  precioPorHora Float
+  horaInicio    DateTime?  
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+}
+
+model Producto {
+  id          String   @id @default(uuid())
+  nombre      String
+  descripcion String?
+  precioVenta Float
+  stock       Int      @default(0)
+  categoria   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Cliente {
+  id               String   @id @default(uuid())
+  nombre           String
+  telefono         String?
+  horasAcumuladas  Int      @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}

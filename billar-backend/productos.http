@@ -1,0 +1,30 @@
+### 1. INSERTAR UNA HAMBURGUESA COMPLETA
+POST http://localhost:3000/productos
+Content-Type: application/json
+
+{
+  "nombre": "Hamburguesa Completa",
+  "precioVenta": 22.0,
+  "stock": 12,
+  "categoria": "Snacks",
+  "descripcion": "Con queso, huevo, papas fritas y salsas"
+}
+
+###
+
+### 2. INSERTAR UNA COCA-COLA PERSONAL
+POST http://localhost:3000/productos
+Content-Type: application/json
+
+{
+  "nombre": "Coca-Cola Personal",
+  "precioVenta": 7.0,
+  "stock": 30,
+  "categoria": "Bebidas",
+  "descripcion": "Botella de vidrio bien fría"
+}
+
+###
+
+### 3. OBTENER TODOS LOS PRODUCTOS
+GET http://localhost:3000/productos
