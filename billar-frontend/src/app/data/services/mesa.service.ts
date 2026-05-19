@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-
+import { environment } from '../../../environments/environment';
 export interface Mesa {
   id?: string;
   numero: number;
@@ -17,7 +17,7 @@ export interface Mesa {
   providedIn: 'root'
 })
 export class MesaService {
-  private apiUrl = 'http://localhost:3000/mesas';
+  private apiUrl = 'http://172.17.27.209:3000/mesas';
 
   constructor(private http: HttpClient) {}
 
